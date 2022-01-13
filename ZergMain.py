@@ -26,6 +26,7 @@ class KingsSwarm(sc2.BotAI):
         await self.build_offensive_force()
         await self.attack()
         await self.inject_larva()
+        await self.build_queens()
 
     async def build_workers(self):
         all_base = self.units(UnitTypeId.HATCHERY) + self.units(UnitTypeId.LAIR) + self.units(UnitTypeId.HIVE)
@@ -116,17 +117,24 @@ class KingsSwarm(sc2.BotAI):
             return self.enemy_start_locations[0]
 
 
-    async def inject_larva(self):
+       async def build_queens(self):
         all_bases = self.units(race_townhalls[Race.Zerg])
         if self.can_afford(UnitTypeId.QUEEN) and self.units(UnitTypeId.SPAWNINGPOOL).amount > 0:
             if self.units(UnitTypeId.QUEEN).amount < len(all_bases):
                 await self.do(all_bases.random.train(UnitTypeId.QUEEN))
 
-        for base in all_bases:
-            for buff in base.buffs:
-                if not buff == BuffId.QUEENSPAWNLARVATIMER:
-                    near_queen = self.units(UnitTypeId.QUEEN, near=base)
-                    await near_queen(AbilityId.EFFECT_INJECTLARVA, base)
+                #Build a queen if a base does not have one
+                #How to cycle through all bases
+                #How to determine if Queen is near
+
+    async def inject_larva(self):
+        all_bases = self.units(race_townhalls[Race.Zerg])
+        all_queens = self.units(race_townhalls[Race.Zerg])
+        if len(all_queens) > 0:
+            for queen in self.units(UnitTypeId.QUEEN).idle:
+                larva_time = await self.get_available_abilities(queen)
+                if AbilityId.EFFECT_INJECTLARVA in larva_time:
+                    await self.do(queen(AbilityId.EFFECT_INJECTLARVA, all_bases.first))
 
 run_game(maps.get("AbyssalReefLE"), [
     Bot(Race.Zerg, KingsSwarm()),
