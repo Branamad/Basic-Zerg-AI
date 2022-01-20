@@ -50,9 +50,9 @@ class KingsSwarm(sc2.BotAI):
                     await self.do(wormybois[0](AbilityId.LARVATRAIN_OVERLORD))
 
     async def expand(self):
-        all_base = self.units(UnitTypeId.HATCHERY) + self.units(UnitTypeId.LAIR) + self.units(UnitTypeId.HIVE)
+        all_base = self.units(race_townhalls[Race.Zerg])
         if self.can_afford(UnitTypeId.HATCHERY):
-            if len(all_base) < 3:
+            if len(all_base) < 2:
                 await self.expand_now()
 
     async def build_extractor(self):
@@ -116,16 +116,11 @@ class KingsSwarm(sc2.BotAI):
         elif len(self.known_enemy_structures) > 0:
             return self.enemy_start_locations[0]
 
-
        async def build_queens(self):
         all_bases = self.units(race_townhalls[Race.Zerg])
-        if self.can_afford(UnitTypeId.QUEEN) and self.units(UnitTypeId.SPAWNINGPOOL).amount > 0:
+        if self.can_afford(UnitTypeId.QUEEN) and self.units(UnitTypeId.SPAWNINGPOOL).amount > 0 and not self.already_pending(UnitTypeId.QUEEN):
             if self.units(UnitTypeId.QUEEN).amount < len(all_bases):
                 await self.do(all_bases.random.train(UnitTypeId.QUEEN))
-
-                #Build a queen if a base does not have one
-                #How to cycle through all bases
-                #How to determine if Queen is near
 
     async def inject_larva(self):
         all_bases = self.units(race_townhalls[Race.Zerg])
